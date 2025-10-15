@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Credit File</title>
+</head>
+<body>
+    <h1>Create Credit File</h1>
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p style="color: {% if category == 'error' %}red{% elif category == 'success' %}green{% else %}blue{% endif %};">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <form method="POST">
+        <label>Type:
+            <select name="type" required>
+                <option value="Leasing">Leasing</option>
+                <option value="Loan">Loan</option>
+                <option value="Other">Other</option>
+            </select>
+        </label><br>
+        <label>Application Number (12 alphanumeric): <input type="text" name="application_number" maxlength="12" required></label><br>
+        <label>Marketing Officer Name: <input type="text" name="marketing_officer_name" required></label><br>
+        <input type="submit" value="Create and Submit">
+    </form>
+</body>
+</html>
