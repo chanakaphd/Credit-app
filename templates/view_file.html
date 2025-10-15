@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Credit File #{{ file.id }}</title>
+</head>
+<body>
+    <h1>Credit File #{{ file.id }} - {{ file.application_number }}</h1>
+    <p>Type: {{ file.type }}</p>
+    <p>Marketing Officer: {{ file.marketing_officer_name }}</p>
+    <p>Status: {{ file.status }}</p>
+    {% if time_taken %}
+        <p>Time Taken: {{ time_taken }}</p>
+    {% endif %}
+    <h2>Remarks</h2>
+    <ul>
+        {% for comment in comments %}
+            <li>{{ comment.created_at }} - {{ comment.role }}: {{ comment.text }}</li>
+        {% endfor %}
+    </ul>
+    {% if role != 'documentation' or file.status != 'Completed' %}
+        <h2>Actions</h2>
+        {% if role == 'compliance' and file.status == 'In Compliance' %}
+            <form method="POST">
+                <input type="hidden" name="action" value="forward">
+                <input type="submit" value="Forward to Documentation">
+            </form>
+            <form method="POST">
+                <input type="hidden" name="action" value="return">
+                <label>Remarks (required): <textarea name="comment" required></textarea></label><br>
+                <input type="submit" value="Return to Marketing">
+            </form>
+        {% elif role == 'documentation' and file.status == 'In Documentation' %}
+            <form method="POST">
+                <input type="hidden" name="action" value="check">
+                <input type="submit" value="Check File">
+            </form>
+        {% elif role == 'documentation' and file.status == 'Checked' %}
+            <form method="POST">
+                <input type="hidden" name="action" value="forward">
+                <input type="submit" value="Complete File">
+            </form>
+            <form method="POST">
+                <input type="hidden" name="action" value="return">
+                <label>Remarks (required): <textarea name="comment" required></textarea></label><br>
+                <input type="submit" value="Return to Marketing">
+            </form>
+        {% elif role == 'marketing' and file.status == 'Returned' %}
+            <h2>Correct File</h2>
+            <form method="POST">
+                <input type="hidden" name="action" value="correct">
+                <label>Type:
+                    <select name="type" required>
+                        <option value="Leasing" {% if file.type == 'Leasing' %}selected{% endif %}>Leasing</option>
+                        <option value="Loan" {% if file.type == 'Loan' %}selected{% endif %}>Loan</option>
+                        <option value="Other" {% if file.type == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </label><br>
+                <label>Application Number: <input type="text" name="application_number" value="{{ file.application_number }}" maxlength="12" required></label><br>
+                <label>Marketing Officer Name: <input type="text" name="marketing_officer_name" value="{{ file.marketing_officer_name }}" required></label><br>
+                <input type="submit" value="Correct and Resubmit to {{ file.returned_by or 'Compliance' | capitalize }}">
+            </form>
+        {% endif %}
+    {% endif %}
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
