@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Credit File Dashboard</h1>
+    <a href="{{ url_for('logout') }}">Logout</a>
+    <form method="POST">
+        <label>Select Role:
+            <select name="role" onchange="this.form.submit()">
+                <option value="marketing" {% if role == 'marketing' %}selected{% endif %}>Marketing Officer</option>
+                <option value="compliance" {% if role == 'compliance' %}selected{% endif %}>Compliance Officer</option>
+                <option value="documentation" {% if role == 'documentation' %}selected{% endif %}>Documentation Officer</option>
+            </select>
+        </label>
+    </form>
+    {% if role == 'marketing' %}
+        <h2>Create New File</h2>
+        <a href="{{ url_for('create_file') }}">Create Credit File</a>
+        <h2>Your Files</h2>
+    {% else %}
+        <h2>Pending Files</h2>
+    {% endif %}
+    <ul>
+        {% for file in files %}
+            <li><a href="{{ url_for('view_file', file_id=file.id) }}">File #{{ file.id }} - {{ file.application_number }} ({{ file.type }}) - Status: {{ file.status }}</a></li>
+        {% endfor %}
+    </ul>
+    {% if role == 'marketing' and returned_files %}
+        <h2>Returned Files (Need Correction)</h2>
+        <ul>
+            {% for file in returned_files %}
+                <li><a href="{{ url_for('view_file', file_id=file.id) }}">File #{{ file.id }} - {{ file.application_number }} ({{ file.type }})</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if role == 'documentation' and completed_files %}
+        <h2>Completed Files</h2>
+        <ul>
+            {% for file in completed_files %}
+                <li>Application Number: {{ file.application_number }} - Status: {{ file.status }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
